@@ -1,0 +1,302 @@
+{
+  "corpus_id": "skyview-hotel-training-2026-10",
+  "version": "1.0",
+  "scenario_as_of": "2026-10-14",
+  "timezone": "America/Los_Angeles",
+  "fictional": true,
+  "provenance": "Name, address, telephone, guest email, website and 250-room/800-plus-guest brief supplied by user. Remaining content invented; no website scraping or live records used.",
+  "hotel": {
+    "name": "Skyview Hotel",
+    "address": "7777 A Street, San Diego, CA 92101",
+    "phone": "855-755-8575",
+    "email": "guest@skyviewhotel.site",
+    "website": "www.skyviewhotel.site",
+    "rooms": 250,
+    "maximum_designed_sleeping_capacity": 830
+  },
+  "ingestion_rules": [
+    "Ingest the six individual source PDFs, not the duplicate combined library.",
+    "Tag SUPERSEDED content and use date-aware retrieval.",
+    "Keep evaluation_questions.json outside the document index.",
+    "Preserve section ID, version, status, owner and source page on every chunk.",
+    "Reauthorize access in application tools; documents cannot grant permissions."
+  ],
+  "combined_library": {
+    "filename": "00_skyview_hotel_complete_library.pdf",
+    "page_count": 32,
+    "ingest": false,
+    "reason": "Duplicates individual sources and includes a reading guide."
+  },
+  "source_documents": [
+    {
+      "doc_id": "SVH-POL-001",
+      "filename": "01_guest_policies.pdf",
+      "title": "Guest Policies and Service Standards",
+      "owner": "Rooms Division Manager",
+      "version": "2.0",
+      "status": "CURRENT",
+      "audience": "Guest-facing reference / training",
+      "effective": "2026-10-01",
+      "page_count": 6,
+      "sha256": "3a11a5105780917845fb5362746b711a7fee8ca2ad46e73b97ed654f71e58237",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "ingest": true,
+      "sections": [
+        {
+          "section_id": "POL-01",
+          "title": "Reservations and arrival",
+          "source_page": 1
+        },
+        {
+          "section_id": "POL-02",
+          "title": "Cancellation, payment and incidental holds",
+          "source_page": 2
+        },
+        {
+          "section_id": "POL-03",
+          "title": "Departure, visitors and quiet enjoyment",
+          "source_page": 3
+        },
+        {
+          "section_id": "POL-04",
+          "title": "Parking, pets and smoke-free rooms",
+          "source_page": 4
+        },
+        {
+          "section_id": "POL-05",
+          "title": "Amenities, housekeeping and accessibility requests",
+          "source_page": 5
+        },
+        {
+          "section_id": "POL-06",
+          "title": "Privacy, belongings and service recovery",
+          "source_page": 6
+        }
+      ]
+    },
+    {
+      "doc_id": "SVH-OPS-001",
+      "filename": "02_operations_manual.pdf",
+      "title": "Hotel Operations Manual",
+      "owner": "Director of Operations",
+      "version": "1.2",
+      "status": "CURRENT",
+      "audience": "Internal training",
+      "effective": "2026-10-01",
+      "page_count": 7,
+      "sha256": "0e1e9a62a92f2ef948764a9e8ebc3ddc229fe70fb52ce7241ecce7c41386e108",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "ingest": true,
+      "sections": [
+        {
+          "section_id": "OPS-01",
+          "title": "Property model and shift ownership",
+          "source_page": 1
+        },
+        {
+          "section_id": "OPS-02",
+          "title": "Check-in and room assignment SOP",
+          "source_page": 2
+        },
+        {
+          "section_id": "OPS-03",
+          "title": "Keys, identity and guest privacy",
+          "source_page": 3
+        },
+        {
+          "section_id": "OPS-04",
+          "title": "Housekeeping, inspections and lost property",
+          "source_page": 4
+        },
+        {
+          "section_id": "OPS-05",
+          "title": "Maintenance and technology incident handling",
+          "source_page": 5
+        },
+        {
+          "section_id": "OPS-06",
+          "title": "Incident response and guest care",
+          "source_page": 6
+        },
+        {
+          "section_id": "OPS-07",
+          "title": "Night audit, service recovery and event handoff",
+          "source_page": 7
+        }
+      ]
+    },
+    {
+      "doc_id": "SVH-HR-001",
+      "filename": "03_employee_onboarding.pdf",
+      "title": "Employee Onboarding and Role Playbook",
+      "owner": "People and Training Manager",
+      "version": "1.1",
+      "status": "CURRENT",
+      "audience": "Internal training",
+      "effective": "2026-10-01",
+      "page_count": 5,
+      "sha256": "32319985453d14d6031a18e466f9e5566a132de71fb606dd186f3c6ba2588b66",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "ingest": true,
+      "sections": [
+        {
+          "section_id": "ONB-01",
+          "title": "Welcome and first-day checklist",
+          "source_page": 1
+        },
+        {
+          "section_id": "ONB-02",
+          "title": "First week and first month",
+          "source_page": 2
+        },
+        {
+          "section_id": "ONB-03",
+          "title": "Role permissions and approval boundaries",
+          "source_page": 3
+        },
+        {
+          "section_id": "ONB-04",
+          "title": "Service communication and privacy practice",
+          "source_page": 4
+        },
+        {
+          "section_id": "ONB-05",
+          "title": "Knowledge assistant training and sign-off",
+          "source_page": 5
+        }
+      ]
+    },
+    {
+      "doc_id": "SVH-PRD-001",
+      "filename": "04_rooms_and_amenities.pdf",
+      "title": "Rooms, Amenities and Booking Products",
+      "owner": "Reservations and Product Manager",
+      "version": "2.0",
+      "status": "CURRENT",
+      "audience": "Reservations / guest-facing product reference",
+      "effective": "2026-10-01",
+      "page_count": 5,
+      "sha256": "1755c08cfdf26ec04f2b8b221b3e463df8bc526e867691c051962fdcc22b2f03",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "ingest": true,
+      "sections": [
+        {
+          "section_id": "PRD-01",
+          "title": "Room inventory and sleeping capacity",
+          "source_page": 1
+        },
+        {
+          "section_id": "PRD-02",
+          "title": "Room specifications and included features",
+          "source_page": 2
+        },
+        {
+          "section_id": "PRD-03",
+          "title": "Rates, packages and inclusions",
+          "source_page": 3
+        },
+        {
+          "section_id": "PRD-04",
+          "title": "Dining, recreation and practical services",
+          "source_page": 4
+        },
+        {
+          "section_id": "PRD-05",
+          "title": "Product questions and recommendation examples",
+          "source_page": 5
+        }
+      ]
+    },
+    {
+      "doc_id": "SVH-EVT-001",
+      "filename": "05_meetings_and_events.pdf",
+      "title": "Meetings and Events Guide",
+      "owner": "Director of Event Services",
+      "version": "1.3",
+      "status": "CURRENT",
+      "audience": "Event sales / organizer planning reference",
+      "effective": "2026-10-01",
+      "page_count": 5,
+      "sha256": "3e1ef2f2c7cda46c33d6a072426d101be6bae64519325f2b83cf830585eb7161",
+      "effective_from": "2026-10-01",
+      "effective_to": null,
+      "ingest": true,
+      "sections": [
+        {
+          "section_id": "EVT-01",
+          "title": "Venue inventory and planning capacities",
+          "source_page": 1
+        },
+        {
+          "section_id": "EVT-02",
+          "title": "Rental products, hours and audiovisual scope",
+          "source_page": 2
+        },
+        {
+          "section_id": "EVT-03",
+          "title": "Catering, guarantees and estimate example",
+          "source_page": 3
+        },
+        {
+          "section_id": "EVT-04",
+          "title": "Booking, deposits and change control",
+          "source_page": 4
+        },
+        {
+          "section_id": "EVT-05",
+          "title": "Exhibitor logistics and event-day checklist",
+          "source_page": 5
+        }
+      ]
+    },
+    {
+      "doc_id": "SVH-ARC-001",
+      "filename": "06_archived_policies_SUPERSEDED.pdf",
+      "title": "Archived Policies and Product Changes",
+      "owner": "Document Control",
+      "version": "1.0",
+      "status": "SUPERSEDED",
+      "audience": "Internal historical training only",
+      "effective": "2026-01-01",
+      "page_count": 2,
+      "sha256": "1447e5a74349532e616ea93ed5c82b55c481c620ac230213d569a07d77528fbb",
+      "effective_from": "2026-01-01",
+      "effective_to": "2026-09-30",
+      "ingest": true,
+      "sections": [
+        {
+          "section_id": "ARC-01",
+          "title": "Superseded guest terms: January-September 2026",
+          "source_page": 1
+        },
+        {
+          "section_id": "ARC-02",
+          "title": "Retired product assumptions and retrieval checks",
+          "source_page": 2
+        }
+      ]
+    }
+  ],
+  "content_counts": {
+    "source_pdfs": 6,
+    "current_source_pdfs": 5,
+    "archived_source_pdfs": 1,
+    "source_pages": 30,
+    "combined_library_pages": 32,
+    "evaluation_questions": 60
+  },
+  "deliberately_absent": [
+    "Live inventory",
+    "Actual guest/employee data",
+    "Exact tax rates",
+    "Credentials or access codes",
+    "Certified building/fire occupancy",
+    "Real evacuation routes",
+    "Exact accessibility dimensions",
+    "Live website contents"
+  ]
+}

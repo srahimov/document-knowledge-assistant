@@ -1,0 +1,284 @@
+{
+  "title": "Modular learning plan for the Skyview Hotel Document Knowledge Assistant",
+  "revised_on": "2026-10-15",
+  "reason": "User requested one LangChain feature per module, separate explanatory lessons, and an entry point limited to initialization and dispatch.",
+  "scope": "Project 1 features and supporting modules, introduced incrementally. The original 60-topic syllabus remains the overarching map across three projects. Conceptual pages and alternative frontend libraries do not each require a Python module.",
+  "package_directory": "src/document_knowledge_assistant",
+  "module_boundary_rule": "Feature code belongs to its named module. Helpers may call one another, but dependency direction and each feature must remain easy to locate. Not every module is a LangChain feature; distinguish source loading, configuration, storage and orchestration as application code.",
+  "bootstrap_contract": {
+    "package_initializer": "__init__.py stays minimal; importing the package does not start the application.",
+    "main": "main.py initializes settings and invokes app.run_app; it does not read PDFs, split text, write chunks, query models or implement retrieval.",
+    "future_console_script_mapping": "document-knowledge-assistant = \"document_knowledge_assistant.main:main\"",
+    "migration_note": "Change the console-script target only after the new main function and the modules it imports exist. Do not empty the current initializer before preserving its useful code in the feature module."
+  },
+  "initial_data_contracts": [
+    {
+      "module": "document_loading.py",
+      "planned_function": "load_pdf(path) -> Document",
+      "meaning": "Return one PDF source text plus filename/version metadata. No model request."
+    },
+    {
+      "module": "text_splitting.py",
+      "planned_function": "split_document(document) -> list[Document]",
+      "meaning": "Return chunk Documents using RecursiveCharacterTextSplitter, preserving source metadata."
+    },
+    {
+      "module": "local_storage.py",
+      "planned_function": "save_chunks(chunks, output_path) -> None",
+      "meaning": "Write JSON with stable chunk identifiers, page_content and metadata."
+    },
+    {
+      "module": "ingestion.py",
+      "planned_function": "run_ingestion(settings)",
+      "meaning": "Coordinate the loader, splitter and local persistence without moving their implementations into main."
+    }
+  ],
+  "citation_design": "Combining all PDF pages initially retains the filename but not automatically accurate page citations. Preserve page/section mappings in a dedicated loader enhancement before claiming precise page citations; never label every chunk page 1.",
+  "modules": [
+    {
+      "filename": "__init__.py",
+      "feature": "Package initialization",
+      "responsibility": "Keep minimal; package identity only, with no ingestion, model calls, file writes or application startup on import.",
+      "syllabus_topic": "Python packaging",
+      "official_reference": null,
+      "status": "planned; create during its lesson"
+    },
+    {
+      "filename": "main.py",
+      "feature": "Application entry point",
+      "responsibility": "Load settings and hand control to the application coordinator; no feature implementation.",
+      "syllabus_topic": "Python entry points",
+      "official_reference": null,
+      "status": "planned; create during its lesson"
+    },
+    {
+      "filename": "configuration.py",
+      "feature": "Configuration",
+      "responsibility": "Read environment/configuration, source locations and local output paths; avoid hardcoded secrets.",
+      "syllabus_topic": "Python configuration / python-dotenv",
+      "official_reference": "https://pypi.org/project/python-dotenv/",
+      "status": "planned; create during its lesson"
+    },
+    {
+      "filename": "app.py",
+      "feature": "Application coordination",
+      "responsibility": "Choose and invoke the current ingestion or question-answering workflow; keep the startup module small.",
+      "syllabus_topic": "Application glue code",
+      "official_reference": null,
+      "status": "planned; create during its lesson"
+    },
+    {
+      "filename": "document_loading.py",
+      "feature": "Document loading",
+      "responsibility": "Read an approved source PDF and return its extracted text with source metadata. Start with one Document per source PDF, rather than a separate lesson creating page Documents.",
+      "syllabus_topic": "Retrieval",
+      "official_reference": "https://pypdf.readthedocs.io/en/stable/user/extract-text.html",
+      "status": "planned; create during its lesson"
+    },
+    {
+      "filename": "text_splitting.py",
+      "feature": "Text splitting",
+      "responsibility": "Configure RecursiveCharacterTextSplitter and produce chunk Documents. No file reading or persistence here.",
+      "syllabus_topic": "Retrieval",
+      "official_reference": "https://docs.langchain.com/oss/python/integrations/splitters/recursive_text_splitter",
+      "status": "planned; create during its lesson"
+    },
+    {
+      "filename": "local_storage.py",
+      "feature": "Local chunk persistence",
+      "responsibility": "Serialize chunk text and metadata to JSON and reconstruct Documents when loading. No database in the initial implementation.",
+      "syllabus_topic": "Project storage adapter",
+      "official_reference": null,
+      "status": "planned; create during its lesson"
+    },
+    {
+      "filename": "ingestion.py",
+      "feature": "Ingestion workflow",
+      "responsibility": "Compose source loading, text splitting and local saving. This is workflow glue rather than an extra LangChain feature.",
+      "syllabus_topic": "Retrieval workflow",
+      "official_reference": "https://docs.langchain.com/oss/python/langchain/retrieval",
+      "status": "planned; create during its lesson"
+    },
+    {
+      "filename": "models.py",
+      "feature": "Chat models",
+      "responsibility": "Initialize and configure the OpenAI chat-model integration.",
+      "syllabus_topic": "Models",
+      "official_reference": "https://docs.langchain.com/oss/python/langchain/models",
+      "status": "planned; create during its lesson"
+    },
+    {
+      "filename": "messages.py",
+      "feature": "Messages",
+      "responsibility": "Construct and inspect system, user, AI and tool messages.",
+      "syllabus_topic": "Messages",
+      "official_reference": "https://docs.langchain.com/oss/python/langchain/messages",
+      "status": "planned; create during its lesson"
+    },
+    {
+      "filename": "embeddings.py",
+      "feature": "Embeddings",
+      "responsibility": "Create the embedding component used to represent chunk/query meaning. Add only when semantic retrieval is introduced.",
+      "syllabus_topic": "Retrieval / embeddings",
+      "official_reference": "https://docs.langchain.com/oss/python/deepagents/retrieval",
+      "status": "planned; create during its lesson"
+    },
+    {
+      "filename": "retrieval.py",
+      "feature": "Retrieval",
+      "responsibility": "Select relevant saved chunks for a question; keep access/version filters and evidence selection separate from model generation. Storage may remain local.",
+      "syllabus_topic": "Retrieval",
+      "official_reference": "https://docs.langchain.com/oss/python/deepagents/retrieval",
+      "status": "planned; create during its lesson"
+    },
+    {
+      "filename": "tools.py",
+      "feature": "Agent tools",
+      "responsibility": "Define typed search tools that delegate to retrieval; tools must not absorb all loader/storage implementation.",
+      "syllabus_topic": "Tools",
+      "official_reference": "https://docs.langchain.com/oss/python/langchain/tools",
+      "status": "planned; create during its lesson"
+    },
+    {
+      "filename": "agents.py",
+      "feature": "Agent creation",
+      "responsibility": "Compose model, tools, instructions and feature configurations with create_agent.",
+      "syllabus_topic": "Agents",
+      "official_reference": "https://docs.langchain.com/oss/python/langchain/agents",
+      "status": "planned; create during its lesson"
+    },
+    {
+      "filename": "structured_output.py",
+      "feature": "Structured responses",
+      "responsibility": "Define validated answer/citation schemas and the response-format integration.",
+      "syllabus_topic": "Structured output",
+      "official_reference": "https://docs.langchain.com/oss/python/langchain/structured-output",
+      "status": "planned; create during its lesson"
+    },
+    {
+      "filename": "short_term_memory.py",
+      "feature": "Thread memory",
+      "responsibility": "Configure conversation-state persistence and thread identity. Start locally; defer Postgres.",
+      "syllabus_topic": "Short-term memory",
+      "official_reference": "https://docs.langchain.com/oss/python/langchain/short-term-memory",
+      "status": "planned; create during its lesson"
+    },
+    {
+      "filename": "long_term_memory.py",
+      "feature": "Cross-thread memory",
+      "responsibility": "Configure approved user preferences/memory and namespaces; keep this distinct from document retrieval.",
+      "syllabus_topic": "Long-term memory",
+      "official_reference": "https://docs.langchain.com/oss/python/langchain/long-term-memory",
+      "status": "planned; create during its lesson"
+    },
+    {
+      "filename": "event_streaming.py",
+      "feature": "Event streaming",
+      "responsibility": "Consume typed message/tool/state projections using the documented event-streaming API.",
+      "syllabus_topic": "Event streaming",
+      "official_reference": "https://docs.langchain.com/oss/python/langchain/event-streaming",
+      "status": "planned; create during its lesson"
+    },
+    {
+      "filename": "streaming.py",
+      "feature": "Stream-mode API",
+      "responsibility": "Isolate the separate stream/astream API lesson and compare it with event streaming.",
+      "syllabus_topic": "Streaming",
+      "official_reference": "https://docs.langchain.com/oss/python/langchain/streaming",
+      "status": "planned; create during its lesson"
+    },
+    {
+      "filename": "middleware.py",
+      "feature": "Middleware",
+      "responsibility": "Compose prebuilt and custom middleware while keeping hooks and their purposes visible.",
+      "syllabus_topic": "Middleware",
+      "official_reference": "https://docs.langchain.com/oss/python/langchain/middleware/overview",
+      "status": "planned; create during its lesson"
+    },
+    {
+      "filename": "guardrails.py",
+      "feature": "Guardrails",
+      "responsibility": "Keep evidence validation, tool authorization boundaries and relevant deterministic checks visible as a distinct lesson.",
+      "syllabus_topic": "Guardrails",
+      "official_reference": "https://docs.langchain.com/oss/python/langchain/guardrails",
+      "status": "planned; create during its lesson"
+    },
+    {
+      "filename": "runtime.py",
+      "feature": "Runtime context",
+      "responsibility": "Define and inject trusted per-request context and dependencies.",
+      "syllabus_topic": "Runtime",
+      "official_reference": "https://docs.langchain.com/oss/python/langchain/runtime",
+      "status": "planned; create during its lesson"
+    },
+    {
+      "filename": "context_engineering.py",
+      "feature": "Context selection",
+      "responsibility": "Select history, retrieved evidence, prompts and available tools without hiding those choices in the entry point.",
+      "syllabus_topic": "Context engineering",
+      "official_reference": "https://docs.langchain.com/oss/python/langchain/context-engineering",
+      "status": "planned; create during its lesson"
+    },
+    {
+      "filename": "observability.py",
+      "feature": "Tracing",
+      "responsibility": "Configure tracing and useful redacted metadata; no credentials in source.",
+      "syllabus_topic": "Observability",
+      "official_reference": "https://docs.langchain.com/oss/python/langchain/observability",
+      "status": "planned; create during its lesson"
+    },
+    {
+      "filename": "evaluations.py",
+      "feature": "Evaluation",
+      "responsibility": "Run the held-out hotel question set and inspect grounded answers, citations and retrieval quality.",
+      "syllabus_topic": "Agent Evals",
+      "official_reference": "https://docs.langchain.com/oss/python/langchain/test/evals",
+      "status": "planned; create during its lesson"
+    }
+  ],
+  "first_lessons": [
+    {
+      "order": 1,
+      "module": "document_loading.py",
+      "goal": "Create a source-loading module and move the PDF-reading responsibility there; explain module import, function parameter and returned Document."
+    },
+    {
+      "order": 2,
+      "module": "text_splitting.py",
+      "goal": "Create the LangChain splitting feature; explain its input, configuration and returned chunk list."
+    },
+    {
+      "order": 3,
+      "module": "local_storage.py",
+      "goal": "Save/reload chunks as inspectable local JSON; preserve citations and versions."
+    },
+    {
+      "order": 4,
+      "module": "ingestion.py",
+      "goal": "Connect the three existing feature functions into one ingestion workflow."
+    },
+    {
+      "order": 5,
+      "module": "main.py and app.py",
+      "goal": "Create the startup/dispatch code, update the console-script mapping and leave package initialization minimal."
+    },
+    {
+      "order": 6,
+      "module": "retrieval.py, embeddings.py, models.py",
+      "goal": "Introduce retrieval and answer generation in separate documented lessons; decide a local retrieval index when that lesson begins."
+    },
+    {
+      "order": 7,
+      "module": "Remaining syllabus modules",
+      "goal": "Introduce each agent/memory/streaming/testing feature in its own module when the curriculum reaches it."
+    }
+  ],
+  "teaching_workflow": [
+    "The user types application code and commands.",
+    "Explain purpose, relevant general Python concepts, data input/output, and LangChain documentation before each implementation.",
+    "Create a module when its lesson starts; empty placeholders may be added only if the user requests scaffolding.",
+    "Inspect saved code/output without changing it; do not treat a proposed refactor as completed."
+  ],
+  "later_extensions": "Place MCP, human review, multi-agent patterns and frontend components in their own feature modules or UI components when the respective original syllabus lessons are reached. Do not invent a universal industry-mandated folder layout.",
+  "application_files_modified_by_this_plan_update": false
+}

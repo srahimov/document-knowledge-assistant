@@ -1,0 +1,808 @@
+{
+  "title": "LangChain Python project curriculum",
+  "researched_on": "2026-10-14",
+  "scope": "The 60 leaf/menu entries shown in the four supplied screenshots, with current official source links. Group labels are not counted. This is not an inventory of every provider integration or every API in the larger LangChain ecosystem.",
+  "collection_type": "Paraphrased topic and code-pattern inventory, source links for full documentation examples, and representative original Python recipes. Not a verbatim mirror of the documentation.",
+  "recommendation": "Three progressively more capable projects sharing infrastructure; start with P1. Cover alternative integrations and UI modes through isolated labs.",
+  "recipe_file": "python_patterns.py",
+  "recipe_validation": "Python syntax parsed with ast; no dependency import, provider request, database operation, or deployment executed.",
+  "architecture": {
+    "frontend": "React/TypeScript on Cloudflare; useStream plus AI Elements as the proposed main path.",
+    "backend": "Python LangChain agents and LangGraph workflows behind a compatible agent server; local development first, persistent backend host for deployment.",
+    "data": "Supabase Postgres for business records, pgvector document retrieval, checkpoints, and long-term memories. Optional Supabase Auth and Storage for user identity and uploads.",
+    "llm": "OpenAI integration; model identifier selected through OPENAI_MODEL after capability/access verification.",
+    "protocol": "Native frontend SDKs need the matching agent-server protocol. Plain FastAPI SSE alone does not supply run, history, resume, queue, or reconnect endpoints.",
+    "memory": "Checkpoint state, cross-thread memories, and document embeddings are three separate storage concerns.",
+    "authorization": "Verify identity at backend; authorize each thread, run, and data/tool access. Apply RLS on exposed Supabase tables. Direct privileged DB access does not automatically inherit frontend JWT/RLS behavior.",
+    "secrets": "Keep model credentials, Postgres URI, and Supabase secret/service credentials server-side.",
+    "missing_setup": "Persistent Python backend hosting for a shared deployment, Postgres connection URI/credentials for checkpointers, and a LangSmith account/API key for the Studio/tracing/evaluation lessons."
+  },
+  "projects": [
+    {
+      "id": "P1",
+      "name": "Document knowledge assistant",
+      "example_request": "Compare our onboarding and refund policies and cite the relevant source sections.",
+      "users": "A small team querying its internal documents, manuals, and policies.",
+      "deliverables": [
+        "Document ingestion with source/version metadata, parsing, chunking, embeddings, and pgvector retrieval.",
+        "Cited answers with explicit insufficient-evidence behavior.",
+        "Persistent chat, cross-thread approved preferences, streaming text and progress.",
+        "Typed answer cards, branching chat, reference Chat UI, and a Cloudflare frontend."
+      ],
+      "suggested_data": [
+        "documents",
+        "document_chunks",
+        "source_versions",
+        "user_preferences",
+        "thread_ownership",
+        "evaluation_cases"
+      ],
+      "proposed_acceptance": [
+        "30 manually reviewed questions; at least 85% correct and evidence-backed answers as an initial learning target.",
+        "Every shown citation resolves to an authorized stored excerpt.",
+        "Unknown-answer cases acknowledge missing evidence.",
+        "Two-user isolation and backend restart recovery pass."
+      ],
+      "estimate_hours": [
+        30,
+        45
+      ],
+      "implementation_structure": "One feature per module; minimal package initializer; startup-only main.py; separate application/ingestion coordinators. See document_assistant_modules.json."
+    },
+    {
+      "id": "P2",
+      "name": "Customer support and order workflow",
+      "example_request": "Investigate order DEMO-42, prepare a resolution, and let a reviewer approve the ticket update.",
+      "users": "Support agents handling orders and customer tickets.",
+      "deliverables": [
+        "Read tools for fictional customers, orders, and policy lookup.",
+        "Draft/approve/edit/reject workflow with a durable pause and audit trail.",
+        "Triage-to-specialist handoffs, runtime auth context, guardrails, and middleware.",
+        "Tool cards, controlled UI, client actions, and sequential message queues."
+      ],
+      "suggested_data": [
+        "customers",
+        "orders",
+        "tickets",
+        "action_proposals",
+        "approvals",
+        "action_attempts",
+        "audit_events"
+      ],
+      "proposed_acceptance": [
+        "Unapproved write proposals never reach the write adapter.",
+        "Retry or replay of an approved action does not duplicate it.",
+        "Role and tenant authorization is checked inside tools.",
+        "Review survives restart and handles edit/reject decisions."
+      ],
+      "estimate_hours": [
+        30,
+        45
+      ]
+    },
+    {
+      "id": "P3",
+      "name": "Business research and operations dashboard",
+      "example_request": "Explain this month's delivery delays using the uploaded reports and order metrics; produce a cited dashboard.",
+      "users": "An operations manager reviewing documents and business metrics.",
+      "deliverables": [
+        "Research lead, document specialist, metrics specialist, and synthesis/verification workflow.",
+        "Router, subagents, on-demand skills, and a custom graph.",
+        "Project-owned MCP read services with connection/auth exercises.",
+        "Long-running background reports with rejoin, checkpoint inspection, and replay-safe outputs.",
+        "Declarative report UI plus isolated open-ended UI and integration comparison labs."
+      ],
+      "suggested_data": [
+        "report_jobs",
+        "report_sources",
+        "report_sections",
+        "metric_snapshots",
+        "skill_versions",
+        "run_audit_events"
+      ],
+      "proposed_acceptance": [
+        "Every key report claim links to a source or deterministic metric.",
+        "Browser refresh rejoins the same retained run.",
+        "Generated UI is validated against a catalog or isolated in a sandbox.",
+        "Compare specialist quality, time, and tokens against a single-agent baseline."
+      ],
+      "estimate_hours": [
+        40,
+        60
+      ]
+    }
+  ],
+  "schedule_assumption": "Approximately 10-15 focused hours/week, with basic Python, HTTP, SQL, and React familiarity. Estimates are planning judgments, not documentation guarantees.",
+  "phases": [
+    {
+      "weeks": "1",
+      "focus": "Environment, model/messages, one tool, structured output, local agent server and trace."
+    },
+    {
+      "weeks": "2-3",
+      "focus": "P1 ingestion, retrieval, citations, memory, streaming, Cloudflare UI, and evaluation baseline."
+    },
+    {
+      "weeks": "4-6",
+      "focus": "P2 domain tools, policies, custom middleware, durable approval, handoffs, action idempotency, and UI."
+    },
+    {
+      "weeks": "7-9",
+      "focus": "P3 routing, specialist tools, custom graph, skills, MCP, reconnect, and declarative reports."
+    },
+    {
+      "weeks": "10-12",
+      "focus": "Remaining integration/UI labs, replay and failure exercises, deployment, evaluation comparison, and documentation."
+    }
+  ],
+  "sources_for_stack": [
+    "https://developers.cloudflare.com/pages/framework-guides/deploy-a-react-site/",
+    "https://developers.cloudflare.com/workers/languages/python/packages/",
+    "https://supabase.com/docs/guides/ai/langchain",
+    "https://supabase.com/docs/guides/database/connecting-to-postgres"
+  ],
+  "lessons": [
+    {
+      "id": "L01",
+      "category": "Foundation",
+      "topic": "Overview",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/overview",
+      "projects": [
+        "P1"
+      ],
+      "code_or_design_pattern": "create_agent; model + tools + prompt + middleware",
+      "completion_exercise": "Explain the agent loop and draw the application's data flow."
+    },
+    {
+      "id": "L02",
+      "category": "Foundation",
+      "topic": "Install",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/install",
+      "projects": [
+        "P1"
+      ],
+      "code_or_design_pattern": "langchain and provider packages; dependency lockfile",
+      "completion_exercise": "Create a Python environment and lock resolved dependencies."
+    },
+    {
+      "id": "L03",
+      "category": "Foundation",
+      "topic": "Quickstart",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/quickstart",
+      "projects": [
+        "P1"
+      ],
+      "code_or_design_pattern": "create_agent; invoke",
+      "completion_exercise": "Run one model and one typed read tool from a Python CLI."
+    },
+    {
+      "id": "L04",
+      "category": "Foundation",
+      "topic": "Changelog",
+      "source_url": "https://changelog.langchain.com/",
+      "projects": [
+        "ALL"
+      ],
+      "code_or_design_pattern": "Version review rather than an executable API",
+      "completion_exercise": "Record installed versions and note relevant changes before upgrades."
+    },
+    {
+      "id": "L05",
+      "category": "Foundation",
+      "topic": "Philosophy",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/philosophy",
+      "projects": [
+        "P1"
+      ],
+      "code_or_design_pattern": "Framework responsibilities and design tradeoffs",
+      "completion_exercise": "Explain when direct model invocation, an agent, or a graph is appropriate."
+    },
+    {
+      "id": "L06",
+      "category": "Core",
+      "topic": "Agents",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/agents",
+      "projects": [
+        "P1"
+      ],
+      "code_or_design_pattern": "create_agent; invoke; ainvoke; AgentState",
+      "completion_exercise": "Build a tool-using assistant and inspect its tool-result-message loop."
+    },
+    {
+      "id": "L07",
+      "category": "Core",
+      "topic": "Models",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/models",
+      "projects": [
+        "P1"
+      ],
+      "code_or_design_pattern": "init_chat_model; invoke; stream; batch; bind_tools; with_structured_output",
+      "completion_exercise": "Compare a direct model request with agent execution; batch classifications."
+    },
+    {
+      "id": "L08",
+      "category": "Core",
+      "topic": "Messages",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/messages",
+      "projects": [
+        "P1"
+      ],
+      "code_or_design_pattern": "SystemMessage; HumanMessage; AIMessage; ToolMessage; content_blocks; usage_metadata",
+      "completion_exercise": "Inspect roles, tool-call IDs, multimodal blocks, and token metadata."
+    },
+    {
+      "id": "L09",
+      "category": "Core",
+      "topic": "Tools",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/tools",
+      "projects": [
+        "P1"
+      ],
+      "code_or_design_pattern": "@tool; typed schemas; ToolRuntime",
+      "completion_exercise": "Expose document search and inspect a tool validation failure."
+    },
+    {
+      "id": "L10",
+      "category": "Core",
+      "topic": "Short-term memory",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/short-term-memory",
+      "projects": [
+        "P1"
+      ],
+      "code_or_design_pattern": "checkpointer; thread_id; InMemorySaver; PostgresSaver",
+      "completion_exercise": "Continue one thread, isolate another, then recover the first after restart."
+    },
+    {
+      "id": "L11",
+      "category": "Core",
+      "topic": "Event streaming",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/event-streaming",
+      "projects": [
+        "P1"
+      ],
+      "code_or_design_pattern": "stream_events(version=v3); messages; tool_calls; values; output",
+      "completion_exercise": "Display text deltas and tool status as independent event projections."
+    },
+    {
+      "id": "L12",
+      "category": "Core",
+      "topic": "Streaming",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/streaming",
+      "projects": [
+        "P1"
+      ],
+      "code_or_design_pattern": "stream/astream; updates; messages; custom; get_stream_writer",
+      "completion_exercise": "Build an ingestion progress indicator and compare with event streaming."
+    },
+    {
+      "id": "L13",
+      "category": "Core",
+      "topic": "Structured output",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/structured-output",
+      "projects": [
+        "P1"
+      ],
+      "code_or_design_pattern": "Pydantic; response_format; ProviderStrategy; ToolStrategy; structured_response",
+      "completion_exercise": "Return a validated answer with source IDs and an evidence status."
+    },
+    {
+      "id": "L14",
+      "category": "Middleware",
+      "topic": "Overview",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/middleware/overview",
+      "projects": [
+        "P2"
+      ],
+      "code_or_design_pattern": "middleware list; node-style and wrap-style hooks",
+      "completion_exercise": "Draw where each policy executes relative to model and tool calls."
+    },
+    {
+      "id": "L15",
+      "category": "Middleware",
+      "topic": "Prebuilt middleware",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/middleware/built-in",
+      "projects": [
+        "P2"
+      ],
+      "code_or_design_pattern": "SummarizationMiddleware; model/tool call limits; retries; fallbacks; PII; HITL",
+      "completion_exercise": "Exercise summarization, a call limit, a recoverable read failure, and PII handling."
+    },
+    {
+      "id": "L16",
+      "category": "Middleware",
+      "topic": "Custom middleware",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/middleware/custom",
+      "projects": [
+        "P2"
+      ],
+      "code_or_design_pattern": "before_model; after_model; wrap_model_call; wrap_tool_call",
+      "completion_exercise": "Implement role-based tool availability and record tool latency without raw private arguments."
+    },
+    {
+      "id": "L17",
+      "category": "Frontend",
+      "topic": "Overview",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/frontend/overview",
+      "projects": [
+        "P1"
+      ],
+      "code_or_design_pattern": "React/TypeScript useStream; typed graph state; agent server protocol",
+      "completion_exercise": "Connect a Python agent server to the Cloudflare-hosted frontend."
+    },
+    {
+      "id": "L18",
+      "category": "Frontend patterns",
+      "topic": "Markdown messages",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/frontend/markdown-messages",
+      "projects": [
+        "P1"
+      ],
+      "code_or_design_pattern": "Streaming message rendering; Markdown components",
+      "completion_exercise": "Render answers and fenced code correctly during incremental updates."
+    },
+    {
+      "id": "L19",
+      "category": "Frontend patterns",
+      "topic": "Tool calling",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/frontend/tool-calling",
+      "projects": [
+        "P2"
+      ],
+      "code_or_design_pattern": "stream.toolCalls; loading/completed/error tool cards",
+      "completion_exercise": "Show order lookup and action status in dedicated cards."
+    },
+    {
+      "id": "L20",
+      "category": "Frontend patterns",
+      "topic": "Headless tools",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/frontend/headless-tools",
+      "projects": [
+        "P2"
+      ],
+      "code_or_design_pattern": "Client-executed tools with server-visible schemas",
+      "completion_exercise": "Let an approved client action open an order panel or copy a draft."
+    },
+    {
+      "id": "L21",
+      "category": "Frontend patterns",
+      "topic": "Human-in-the-Loop",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/frontend/human-in-the-loop",
+      "projects": [
+        "P2"
+      ],
+      "code_or_design_pattern": "Interrupt UI; approve/edit/reject; resume",
+      "completion_exercise": "Review a proposed ticket update and resume the same durable thread."
+    },
+    {
+      "id": "L22",
+      "category": "Frontend patterns",
+      "topic": "Branching chat",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/frontend/branching-chat",
+      "projects": [
+        "P1"
+      ],
+      "code_or_design_pattern": "Edit/regenerate/fork using checkpoint-backed history",
+      "completion_exercise": "Compare two answers to an edited question while preserving both branches."
+    },
+    {
+      "id": "L23",
+      "category": "Frontend patterns",
+      "topic": "Reasoning tokens",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/frontend/reasoning-tokens",
+      "projects": [
+        "P3"
+      ],
+      "code_or_design_pattern": "Provider-exposed reasoning blocks or summaries; conditional rendering",
+      "completion_exercise": "Render available reasoning summaries; show tool progress when the model exposes none."
+    },
+    {
+      "id": "L24",
+      "category": "Frontend patterns",
+      "topic": "Structured output",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/frontend/structured-output",
+      "projects": [
+        "P1"
+      ],
+      "code_or_design_pattern": "Typed response/state mapped to custom components",
+      "completion_exercise": "Render sources and evidence status as a card rather than raw JSON."
+    },
+    {
+      "id": "L25",
+      "category": "Frontend patterns",
+      "topic": "Message queues",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/frontend/message-queues",
+      "projects": [
+        "P2"
+      ],
+      "code_or_design_pattern": "Queued submissions and sequential run policy",
+      "completion_exercise": "Submit two follow-ups during a run and verify deterministic processing order."
+    },
+    {
+      "id": "L26",
+      "category": "Frontend patterns",
+      "topic": "Join & rejoin streams",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/frontend/join-rejoin",
+      "projects": [
+        "P3"
+      ],
+      "code_or_design_pattern": "Run/thread IDs; durable background run; reconnect support",
+      "completion_exercise": "Close and reopen the browser during research and reconnect to the same run."
+    },
+    {
+      "id": "L27",
+      "category": "Frontend patterns",
+      "topic": "Time travel",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/frontend/time-travel",
+      "projects": [
+        "P3"
+      ],
+      "code_or_design_pattern": "Checkpoint history; inspect and resume/fork",
+      "completion_exercise": "Replay an analysis from a checkpoint without repeating a committed external write."
+    },
+    {
+      "id": "L28",
+      "category": "Generative UI",
+      "topic": "Overview",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/frontend/generative-ui-overview",
+      "projects": [
+        "P3"
+      ],
+      "code_or_design_pattern": "Controlled vs declarative vs open-ended interfaces",
+      "completion_exercise": "Choose a rendering contract for each report output."
+    },
+    {
+      "id": "L29",
+      "category": "Generative UI",
+      "topic": "Controlled",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/frontend/controlled-generative-ui",
+      "projects": [
+        "P2"
+      ],
+      "code_or_design_pattern": "Prewritten component catalog selected by agent output",
+      "completion_exercise": "Render order, ticket, and approval components with fixed schemas."
+    },
+    {
+      "id": "L30",
+      "category": "Generative UI",
+      "topic": "Declarative",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/frontend/declarative-generative-ui",
+      "projects": [
+        "P3"
+      ],
+      "code_or_design_pattern": "Validated UI specification; registered component catalog",
+      "completion_exercise": "Render a report as tables and charts from a constrained declarative schema."
+    },
+    {
+      "id": "L31",
+      "category": "Generative UI",
+      "topic": "Open-ended",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/frontend/open-ended-generative-ui",
+      "projects": [
+        "P3"
+      ],
+      "code_or_design_pattern": "Generated artifacts/MCP UI rendered in an isolated sandbox",
+      "completion_exercise": "Build a sandboxed bespoke visualization lab without exposing privileged application context."
+    },
+    {
+      "id": "L32",
+      "category": "Frontend integrations",
+      "topic": "Overview",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/frontend/integrations/overview",
+      "projects": [
+        "P3"
+      ],
+      "code_or_design_pattern": "Integration contract comparison",
+      "completion_exercise": "Compare protocol, UI state ownership, and backend requirements of four libraries."
+    },
+    {
+      "id": "L33",
+      "category": "Frontend integrations",
+      "topic": "CopilotKit",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/frontend/integrations/copilotkit",
+      "projects": [
+        "P3"
+      ],
+      "code_or_design_pattern": "Copilot runtime/endpoint; structured assistant payloads",
+      "completion_exercise": "Prototype the same simple report card in an isolated integration lab."
+    },
+    {
+      "id": "L34",
+      "category": "Frontend integrations",
+      "topic": "AI Elements",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/frontend/integrations/ai-elements",
+      "projects": [
+        "P1"
+      ],
+      "code_or_design_pattern": "Presentation components wired to useStream state",
+      "completion_exercise": "Use as the proposed primary chat presentation layer."
+    },
+    {
+      "id": "L35",
+      "category": "Frontend integrations",
+      "topic": "assistant-ui",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/frontend/integrations/assistant-ui",
+      "projects": [
+        "P3"
+      ],
+      "code_or_design_pattern": "useExternalStoreRuntime; AssistantRuntimeProvider",
+      "completion_exercise": "Adapt the same agent to a second chat shell as a comparison lab."
+    },
+    {
+      "id": "L36",
+      "category": "Frontend integrations",
+      "topic": "OpenUI",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/frontend/integrations/openui",
+      "projects": [
+        "P3"
+      ],
+      "code_or_design_pattern": "openui-lang DSL and report rendering",
+      "completion_exercise": "Prototype the same report using the documented DSL and compare with the primary renderer."
+    },
+    {
+      "id": "L37",
+      "category": "Advanced",
+      "topic": "Guardrails",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/guardrails",
+      "projects": [
+        "P2"
+      ],
+      "code_or_design_pattern": "Deterministic checks; middleware; content and action validation",
+      "completion_exercise": "Test prompt injection, unauthorized order access, and disallowed action arguments."
+    },
+    {
+      "id": "L38",
+      "category": "Advanced",
+      "topic": "Runtime",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/runtime",
+      "projects": [
+        "P2"
+      ],
+      "code_or_design_pattern": "context_schema; ToolRuntime; Runtime; store; stream_writer",
+      "completion_exercise": "Inject verified tenant/user identity and dependencies outside model-controlled tool arguments."
+    },
+    {
+      "id": "L39",
+      "category": "Advanced",
+      "topic": "Context engineering",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/context-engineering",
+      "projects": [
+        "P1",
+        "P2"
+      ],
+      "code_or_design_pattern": "Dynamic prompts/tools; history summarization; retrieved evidence selection",
+      "completion_exercise": "Keep relevant policy and tool-result pairs while excluding stale or unauthorized context."
+    },
+    {
+      "id": "L40",
+      "category": "MCP",
+      "topic": "Overview",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/mcp",
+      "projects": [
+        "P3"
+      ],
+      "code_or_design_pattern": "MCPAdapter; langchain[mcp]>=1.4.0 in current docs; beta",
+      "completion_exercise": "Connect to a public documentation MCP server with an explicit read-tool allowlist."
+    },
+    {
+      "id": "L41",
+      "category": "MCP",
+      "topic": "Tools",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/mcp/tools",
+      "projects": [
+        "P3"
+      ],
+      "code_or_design_pattern": "list_tools; adapted ToolMessage; structured artifacts; errors",
+      "completion_exercise": "Discover tools, validate returned data, and exercise a failed remote tool."
+    },
+    {
+      "id": "L42",
+      "category": "MCP",
+      "topic": "Connections",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/mcp/connections",
+      "projects": [
+        "P3"
+      ],
+      "code_or_design_pattern": "HTTP/stdio/in-process transports; MCPConfig; connection lifecycle",
+      "completion_exercise": "Connect two small project-owned services and test reconnect/error handling."
+    },
+    {
+      "id": "L43",
+      "category": "MCP",
+      "topic": "Authentication",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/mcp/auth",
+      "projects": [
+        "P3"
+      ],
+      "code_or_design_pattern": "Bearer/OAuth/per-user server credentials; authorization",
+      "completion_exercise": "Add auth to a project-owned MCP server and reject invalid or cross-tenant calls."
+    },
+    {
+      "id": "L44",
+      "category": "Advanced",
+      "topic": "Human-in-the-loop",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/human-in-the-loop",
+      "projects": [
+        "P2"
+      ],
+      "code_or_design_pattern": "HumanInTheLoopMiddleware; persistent checkpoints; Command(resume=...)",
+      "completion_exercise": "Pause an action, restart the backend, then approve/edit/reject it with an audit record."
+    },
+    {
+      "id": "L45",
+      "category": "Multi-agent",
+      "topic": "Overview",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/multi-agent/index",
+      "projects": [
+        "P3"
+      ],
+      "code_or_design_pattern": "Pattern selection; context boundaries; orchestration cost",
+      "completion_exercise": "Compare a single-agent baseline with specialists on the same fixed dataset."
+    },
+    {
+      "id": "L46",
+      "category": "Multi-agent",
+      "topic": "Subagents",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/multi-agent/subagents",
+      "projects": [
+        "P3"
+      ],
+      "code_or_design_pattern": "Specialist create_agent instances wrapped as tools",
+      "completion_exercise": "Have a research lead consult document and metrics specialists with narrow contexts."
+    },
+    {
+      "id": "L47",
+      "category": "Multi-agent",
+      "topic": "Handoffs",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/multi-agent/handoffs",
+      "projects": [
+        "P2"
+      ],
+      "code_or_design_pattern": "Active-specialist state; Command updates; valid tool-result messages",
+      "completion_exercise": "Transfer a conversation from triage to billing or delivery while retaining useful context."
+    },
+    {
+      "id": "L48",
+      "category": "Multi-agent",
+      "topic": "Skills",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/multi-agent/skills",
+      "projects": [
+        "P3"
+      ],
+      "code_or_design_pattern": "Allowlisted load_skill tool; progressive prompt disclosure",
+      "completion_exercise": "Load a project-owned analysis rubric on demand and record its version."
+    },
+    {
+      "id": "L49",
+      "category": "Multi-agent",
+      "topic": "Router",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/multi-agent/router",
+      "projects": [
+        "P3"
+      ],
+      "code_or_design_pattern": "Classifier; Command; Send for fan-out; synthesis",
+      "completion_exercise": "Route document and metrics questions; add parallel dispatch only for independent work."
+    },
+    {
+      "id": "L50",
+      "category": "Multi-agent",
+      "topic": "Custom workflow",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/multi-agent/custom-workflow",
+      "projects": [
+        "P3"
+      ],
+      "code_or_design_pattern": "StateGraph; nodes; edges; deterministic + agentic steps",
+      "completion_exercise": "Build plan -> research -> verify -> review -> publish with explicit transitions."
+    },
+    {
+      "id": "L51",
+      "category": "Advanced",
+      "topic": "Retrieval",
+      "source_url": "https://docs.langchain.com/oss/python/deepagents/retrieval",
+      "projects": [
+        "P1"
+      ],
+      "code_or_design_pattern": "Loaders; chunking; embeddings; vector retrieval; 2-step and agentic RAG",
+      "completion_exercise": "Index project documents in Supabase pgvector; compare fixed retrieval with agent-directed retrieval."
+    },
+    {
+      "id": "L52",
+      "category": "Advanced",
+      "topic": "Long-term memory",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/long-term-memory",
+      "projects": [
+        "P1"
+      ],
+      "code_or_design_pattern": "InMemoryStore/PostgresStore; namespace + key; runtime.store",
+      "completion_exercise": "Read approved preferences across threads and enforce tenant access in the backend."
+    },
+    {
+      "id": "L53",
+      "category": "Development",
+      "topic": "LangSmith Studio",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/studio",
+      "projects": [
+        "ALL"
+      ],
+      "code_or_design_pattern": "langgraph.json; graph export; langgraph dev; trace inspection",
+      "completion_exercise": "Inspect state and tool calls for a failing example and replay it during development."
+    },
+    {
+      "id": "L54",
+      "category": "Testing",
+      "topic": "Overview",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/test",
+      "projects": [
+        "ALL"
+      ],
+      "code_or_design_pattern": "Unit vs integration vs trajectory evaluation",
+      "completion_exercise": "Separate deterministic correctness from model quality and record both."
+    },
+    {
+      "id": "L55",
+      "category": "Testing",
+      "topic": "Unit testing",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/test/unit-testing",
+      "projects": [
+        "ALL"
+      ],
+      "code_or_design_pattern": "pytest; fake chat model; in-memory persistence",
+      "completion_exercise": "Test routing, validation, authorization, and review decisions without model API calls."
+    },
+    {
+      "id": "L56",
+      "category": "Testing",
+      "topic": "Integration testing",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/test/integration-testing",
+      "projects": [
+        "ALL"
+      ],
+      "code_or_design_pattern": "Real provider/database calls; fixtures; marked cost-limited runs",
+      "completion_exercise": "Verify model + retrieval + persistence + API streaming against a disposable dataset."
+    },
+    {
+      "id": "L57",
+      "category": "Testing",
+      "topic": "Agent Evals",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/test/evals",
+      "projects": [
+        "ALL"
+      ],
+      "code_or_design_pattern": "Trajectory checks; deterministic match; LLM judges; experiments",
+      "completion_exercise": "Track answer grounding, correct tool use, completion, latency, and tokens on fixed cases."
+    },
+    {
+      "id": "L58",
+      "category": "Development",
+      "topic": "Agent Chat UI",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/ui",
+      "projects": [
+        "P1"
+      ],
+      "code_or_design_pattern": "Reference chat client + compatible agent server",
+      "completion_exercise": "Validate backend behavior in the reference client before custom UI debugging."
+    },
+    {
+      "id": "L59",
+      "category": "Production",
+      "topic": "Deployment",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/deploy",
+      "projects": [
+        "ALL"
+      ],
+      "code_or_design_pattern": "Agent server; persistent state; background execution; authenticated API",
+      "completion_exercise": "Deploy the frontend on Cloudflare and Python on a compatible persistent backend."
+    },
+    {
+      "id": "L60",
+      "category": "Production",
+      "topic": "Observability",
+      "source_url": "https://docs.langchain.com/oss/python/langchain/observability",
+      "projects": [
+        "ALL"
+      ],
+      "code_or_design_pattern": "LangSmith traces; run/thread metadata; tool/model latency; errors",
+      "completion_exercise": "Correlate user-visible runs with traces and redacted application logs."
+    }
+  ],
+  "project_1_modular_plan": "document_assistant_modules.json"
+}
